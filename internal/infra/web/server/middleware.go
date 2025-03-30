@@ -10,17 +10,21 @@ const TOO_MANY_REQUESTS = "you have reached the maximum number of requests or ac
 
 func RateLimitMiddleware(limiter *limiter.RateLimiter, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ip := r.RemoteAddr
-		key := r.Header.Get("API_KEY")
-
-		if key == "" {
-			key = ip
+		// Extract API key from header or use IP as fallback
+		var key, limiterType string
+		if apiKey := r.Header.Get("X-API-Key"); apiKey != "" {
+			key = apiKey
+			limiterType = "api_key"
+		} else {
+			key = r.RemoteAddr
+			limiterType = "ip"
 		}
 
-		if !limiter.ShouldPass(key) {
+		if !limiter.ShouldPass(key, limiterType) {
 			http.Error(w, TOO_MANY_REQUESTS, http.StatusTooManyRequests)
 			return
 		}
+
 		next.ServeHTTP(w, r)
 	})
 }

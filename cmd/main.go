@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/lmtani/learning-rate-limiter/configs"
 	"github.com/lmtani/learning-rate-limiter/internal/infra/storage"
 	"github.com/lmtani/learning-rate-limiter/internal/infra/web"
 	"github.com/lmtani/learning-rate-limiter/internal/infra/web/server"
@@ -12,18 +13,25 @@ import (
 )
 
 func main() {
+	// Load configuration
+	config, err := configs.LoadConfig()
+	if err != nil {
+		fmt.Println("Error loading configuration:", err)
+		return
+	}
+
 	// Initialize Redis storage and check if is reachable
-	redisStorage := storage.NewRedisStorage("localhost:6379", "", 0)
+	redisStorage := storage.NewRedisStorage(config.RedisAddr, config.RedisPassword, 0)
 	if err := redisStorage.Client.Ping(redisStorage.Client.Context()).Err(); err != nil {
 		fmt.Println("Error connecting to Redis:", err)
 		return
 	}
 
 	// Initialize rate limiter with Redis storage
-	rateLimiter := limiter.NewRateLimiter(2, 10*time.Second, redisStorage)
+	rateLimiter := limiter.NewRateLimiter(2, 10*time.Second, redisStorage, config.TokenToLimit)
 
 	// Initialize web server
-	webServer := server.NewWebServer(":8080", rateLimiter)
+	webServer := server.NewWebServer(config.WebServerPort, rateLimiter)
 
 	// Add handlers to the web server
 	helloUseCase := usecase.NewHelloUseCase()
