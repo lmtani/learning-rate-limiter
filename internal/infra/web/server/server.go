@@ -31,8 +31,11 @@ func (s *WebServer) Start() {
 		s.Router.Handle(path, handler)
 	}
 
+	// Use Request Logging Middleware
+	loggedRouter := LoggingMiddleware(s.Router)
+
 	// Use limiter middleware
-	limitedRouter := RateLimitMiddleware(s.RateLimiter, s.Router)
+	limitedRouter := RateLimitMiddleware(s.RateLimiter, loggedRouter)
 
 	err := http.ListenAndServe(s.WebServerPort, limitedRouter)
 	if err != nil {
