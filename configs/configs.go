@@ -8,12 +8,12 @@ import (
 
 // Config struct to hold the configuration values
 type Config struct {
-	RedisAddr     string          `envconfig:"REDIS_ADDR"`
-	RedisPassword string          `envconfig:"REDIS_PASSWORD"`
-	WebServerPort string          `envconfig:"WEB_SERVER_PORT"`
-	RateLimit     int             `envconfig:"RATE_LIMIT"`
-	Expire        int             `envconfig:"EXPIRE"`
-	TokenToLimit  entity.TokenMap `envconfig:"TOKEN_TO_LIMIT"`
+	RedisAddr         string          `envconfig:"REDIS_ADDR"`
+	RedisPassword     string          `envconfig:"REDIS_PASSWORD"`
+	WebServerPort     string          `envconfig:"WEB_SERVER_PORT"`
+	RequestsPerSecond int             `envconfig:"REQUESTS_PER_SECOND"`
+	WindowSize        int             `envconfig:"WINDOW_SIZE"`
+	ApiKeyLimits      entity.TokenMap `envconfig:"API_KEY_LIMITS"`
 }
 
 func LoadConfig() (*Config, error) {

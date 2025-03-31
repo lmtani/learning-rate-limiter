@@ -22,9 +22,9 @@ cp template.env .env
 ```env
 REDIS_ADDR='localhost:6379'      # Endereço do Redis
 WEB_SERVER_PORT=:8080            # Porta do serviço
-RATE_LIMIT=10                    # Limite padrão de requisições/segundo
-EXPIRE=10                        # Tempo de expiração em segundos
-TOKEN_TO_LIMIT={"abc123": 100}   # Chaves especiais com limites personalizados (API_KEY)
+REQUESTS_PER_SECOND=10           # Limite padrão de requisições/segundo
+WindowSize=10                    # Tempo de expiração em segundos
+API_KEY_LIMITS={"abc123": 100}   # Chaves especiais com limites personalizados (API_KEY)
 ```
 
 ## Execução com Docker
@@ -66,10 +66,10 @@ curl -X GET http://localhost:8080/hello \
 
 ## Variáveis de Ambiente
 
-| Variável        | Descrição                                  | Padrão         |
-|-----------------|-------------------------------------------|----------------|
-| REDIS_ADDR      | Endereço do servidor Redis                | localhost:6379 |
-| WEB_SERVER_PORT | Porta HTTP do serviço                     | :8080          |
-| RATE_LIMIT      | Limite global de requisições/segundo      | 2              |
-| EXPIRE          | Janela temporal para contagem (segundos)  | 10             |
-| TOKEN_TO_LIMIT  | Mapa de tokens com limites personalizados | {}             |
+| Variável            | Descrição                                  |
+|---------------------|--------------------------------------------|
+| REDIS_ADDR          | Endereço do servidor Redis                 |
+| WEB_SERVER_PORT     | Porta HTTP do serviço                      |
+| REQUESTS_PER_SECOND | Limite global de requisições/segundo       |
+| WINDOW_SIZE         | Janela temporal para contagem (segundos)   |
+| API_KEY_LIMITS      | Mapa de tokens com limites personalizados  |

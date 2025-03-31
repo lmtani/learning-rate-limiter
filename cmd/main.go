@@ -28,7 +28,7 @@ func main() {
 	}
 
 	// Initialize rate limiter with Redis storage
-	rateLimiter := limiter.NewRateLimiter(2, 10*time.Second, redisStorage, config.TokenToLimit)
+	rateLimiter := limiter.NewRateLimiter(config.RequestsPerSecond, time.Duration(config.WindowSize)*time.Second, redisStorage, config.ApiKeyLimits)
 
 	// Initialize web server
 	webServer := server.NewWebServer(config.WebServerPort, rateLimiter)
