@@ -73,3 +73,11 @@ curl -X GET http://localhost:8080/hello \
 | REQUESTS_PER_SECOND | Limite global de requisições/segundo       |
 | WINDOW_SIZE         | Janela temporal para contagem (segundos)   |
 | API_KEY_LIMITS      | Mapa de tokens com limites personalizados  |
+
+## Teste de Carga
+
+Para realizar testes de carga no serviço, você pode utilizar a ferramenta [vegeta](https://github.com/tsenart/vegeta):
+
+```bash
+# Teste simples com uma API_KEY específica (6 segundos de duração)
+echo "GET http://localhost:8080/hello" | ./vegeta attack -duration=6s -header "API_KEY: def456" | tee results.bin | ./vegeta report
