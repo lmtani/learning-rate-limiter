@@ -24,7 +24,7 @@ func (m *MockRateLimiterStore) Reset(key string) error {
 	return args.Error(0)
 }
 
-func TestRateLimiter_ShouldPass(t *testing.T) {
+func TestRateLimiter_ShallPass(t *testing.T) {
 	tests := []struct {
 		name      string
 		key       string
@@ -110,7 +110,7 @@ func TestRateLimiter_ShouldPass(t *testing.T) {
 			}
 
 			rl := NewRateLimiter(tt.limit, time.Minute, mockStore, tt.tokenMap)
-			got := rl.ShouldPass(tt.key, tt.limitType)
+			got := rl.ShallPass(tt.key, tt.limitType)
 
 			assert.Equal(t, tt.want, got)
 			mockStore.AssertExpectations(t)

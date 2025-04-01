@@ -14,7 +14,7 @@ func RateLimitMiddleware(limiter *limiter.RateLimiter, next http.Handler) http.H
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Extract API key from header or use IP as fallback
 		var key, limiterType string
-		if apiKey := r.Header.Get("X-API-Key"); apiKey != "" {
+		if apiKey := r.Header.Get("API_KEY"); apiKey != "" {
 			key = apiKey
 			limiterType = "api_key"
 		} else {
@@ -22,8 +22,9 @@ func RateLimitMiddleware(limiter *limiter.RateLimiter, next http.Handler) http.H
 			limiterType = "ip"
 		}
 
-		if !limiter.ShouldPass(key, limiterType) {
+		if !limiter.ShallPass(key, limiterType) {
 			http.Error(w, TOO_MANY_REQUESTS, http.StatusTooManyRequests)
+			log.Printf("Rate limit exceeded for '%s': '%s'", limiterType, key)
 			return
 		}
 
