@@ -39,6 +39,8 @@ docker compose down
 
 ## Execução local (sem Docker)
 
+Com base no arquivo `template.env`, crie um arquivo `.env` na raiz do projeto. Certifique-se de ajustar a string de conexão do Redis, substituindo o valor `redis` por `localhost`.
+
 ```bash
 # Iniciar Redis
 docker compose up -d redis
@@ -53,7 +55,7 @@ Verifique o status do rate limiting:
 
 ```bash
 curl -X GET http://localhost:8080/hello \
-  -H "API_KEY: Bearer abc123"
+  -H "API_KEY: abc123"
 ```
 
 ### Exemplo de resposta
