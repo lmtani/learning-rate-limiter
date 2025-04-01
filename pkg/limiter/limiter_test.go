@@ -14,7 +14,7 @@ type MockRateLimiterStore struct {
 	mock.Mock
 }
 
-func (m *MockRateLimiterStore) Increment(key string, expire time.Duration) (int, error) {
+func (m *MockRateLimiterStore) Increment(key string, expire time.Duration, limit int) (int, error) {
 	args := m.Called(key, expire)
 	return args.Int(0), args.Error(1)
 }
@@ -57,6 +57,7 @@ func TestRateLimiter_ShallPass(t *testing.T) {
 			limitType: "ip",
 			count:     11,
 			limit:     10,
+			storeErr:  errors.New("limit reached"),
 			want:      false,
 		},
 		{
@@ -106,7 +107,7 @@ func TestRateLimiter_ShallPass(t *testing.T) {
 
 			// Configurar mock para o método Increment
 			if tt.limitType == "ip" || tt.limitType == "api_key" {
-				mockStore.On("Increment", tt.key, mock.Anything).Return(tt.count, tt.storeErr)
+				mockStore.On("Increment", tt.key, mock.Anything, mock.Anything).Return(tt.count, tt.storeErr)
 			}
 
 			rl := NewRateLimiter(tt.limit, time.Minute, mockStore, tt.tokenMap)

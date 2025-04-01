@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -24,15 +25,31 @@ func NewRedisStorage(addr, password string, db int) *RedisStorage {
 // Increment increments the value of the key in Redis and sets an expiration time.
 // The expiration time is set to the value of 'expire' and is updated with each increment.
 // The method returns the incremented value and an error if any occurs.
-func (r *RedisStorage) Increment(key string, expire time.Duration) (int, error) {
-	pipe := r.Client.TxPipeline()
-	incr := pipe.Incr(context.TODO(), key)
-	pipe.Expire(context.TODO(), key, expire)
-	_, err := pipe.Exec(r.Client.Context())
-	if err != nil {
+func (r *RedisStorage) Increment(key string, expire time.Duration, limit int) (int, error) {
+	ctx := context.TODO()
+
+	// Get current value first to check limit
+	val, err := r.Client.Get(ctx, key).Int()
+	if err != nil && err != redis.Nil {
 		return 0, err
 	}
-	// Retorna o valor incrementado
+
+	// Check if already at or over limit
+	if val >= limit {
+		return 0, fmt.Errorf("limit of %d reached for key: %s", val, key)
+	}
+
+	// Increment the counter
+	incr := r.Client.Incr(ctx, key)
+	if err := incr.Err(); err != nil {
+		return 0, err
+	}
+
+	// Reset expiration time
+	if err := r.Client.Expire(ctx, key, expire).Err(); err != nil {
+		return 0, err
+	}
+
 	return int(incr.Val()), nil
 }
 

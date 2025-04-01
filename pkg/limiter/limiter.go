@@ -11,7 +11,7 @@ type RateLimiterI interface {
 }
 
 type RateLimiterStore interface {
-	Increment(key string, expire time.Duration) (int, error)
+	Increment(key string, expire time.Duration, limit int) (int, error)
 	Reset(key string) error
 }
 
@@ -44,13 +44,8 @@ func (rl *RateLimiter) ShallPass(key string, limitType string) bool {
 	}
 
 	// Increment the counter for the key
-	count, err := rl.Store.Increment(key, rl.Expire)
+	_, err := rl.Store.Increment(key, rl.Expire, limit)
 	if err != nil {
-		return false
-	}
-
-	// Apply appropriate limit
-	if count > limit {
 		return false
 	}
 
